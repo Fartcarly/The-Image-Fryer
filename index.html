@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/addons/p5.sound.min.js"></script>
+    <title>The Image Fryer
+
+    </title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+    <style>
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="img/The Image Fryer.png" alt="The Image Fryer">
+      <div class="mainstuff">
+        <div class="controls">
+          <img src="img/Select Ingredients.png" alt="Select Ingredients">
+          <button id="choose-btn" class="choose-btn" aria-label="Choose photo">
+            <img src="img/Choose Photo.png" alt="Choose File...">
+          </button>
+          <input type="file" id="file-input" accept="image/*" style="display:none" />
+          <img src="img/Take a photo.png" alt="Take a photo">
+        </div>
+        <img src="img/Big Fryer.png" alt="Big Fryer">
+      </div>
+    </main>
+  </body>
+  <script src="sketch.js"></script>
+  <script>
+    (function(){
+      const btn = document.getElementById('choose-btn');
+      const input = document.getElementById('file-input');
+      if (!btn || !input) return;
+      btn.addEventListener('click', function(){ input.click(); });
+      input.addEventListener('change', function(e){
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          if (typeof window.handleFile === 'function') {
+            window.handleFile(file);
+          } else {
+            console.log('Selected file:', file.name);
+          }
+        }
+      });
+    })();
+  </script>
+</html>
