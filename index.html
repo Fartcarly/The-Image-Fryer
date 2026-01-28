@@ -18,33 +18,99 @@
       <div class="mainstuff">
         <div class="controls">
           <img src="img/Select Ingredients.png" alt="Select Ingredients">
-          <button id="choose-btn" class="choose-btn" aria-label="Choose photo">
-            <img src="img/Choose Photo.png" alt="Choose File...">
+          <button id="choose-btn" class="choose-btn" aria-label="Choose file">
+            <img src="img/Choose File.png" alt="Choose File...">
           </button>
           <input type="file" id="file-input" accept="image/*" style="display:none" />
-          <img src="img/Take a photo.png" alt="Take a photo">
+          <button id="take-photo-btn" class="choose-btn" aria-label="Take a photo">
+            <img src="img/Take a photo.png" alt="Take a photo">
+          </button>
         </div>
-        <img src="img/Big Fryer.png" alt="Big Fryer">
+        <img src="img/Big Fryer2.png" alt="Big Fryer">
       </div>
     </main>
-  </body>
-  <script src="sketch.js"></script>
-  <script>
+
+    <!-- Camera modal / UI -->
+    <div id="camera-modal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);z-index:9999;">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;align-items:center;">
+        <video id="camera-video" autoplay playsinline style="max-width:90vw;max-height:70vh;background:#000;"></video>
+        <div style="display:flex;gap:0.5rem;">
+          <button id="capture-btn">Capture</button>
+          <button id="close-camera-btn">Close</button>
+        </div>
+      </div>
+    </div>
+    <canvas id="camera-canvas" style="display:none;"></canvas>
+   </body>
+   <script src="sketch.js"></script>
+   <script>
     (function(){
-      const btn = document.getElementById('choose-btn');
-      const input = document.getElementById('file-input');
-      if (!btn || !input) return;
-      btn.addEventListener('click', function(){ input.click(); });
-      input.addEventListener('change', function(e){
+      const chooseBtn = document.getElementById('choose-btn');
+      const fileInput = document.getElementById('file-input');
+      const takePhotoBtn = document.getElementById('take-photo-btn');
+      const cameraModal = document.getElementById('camera-modal');
+      const video = document.getElementById('camera-video');
+      const captureBtn = document.getElementById('capture-btn');
+      const closeBtn = document.getElementById('close-camera-btn');
+      const canvas = document.getElementById('camera-canvas');
+      let stream = null;
+
+      if (chooseBtn && fileInput) {
+        chooseBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
+      }
+
+      if (takePhotoBtn) {
+        takePhotoBtn.addEventListener('click', openCamera);
+      }
+
+      captureBtn.addEventListener('click', capturePhoto);
+      closeBtn.addEventListener('click', closeCamera);
+
+      function handleFileSelect(e){
         const file = e.target.files && e.target.files[0];
-        if (file) {
-          if (typeof window.handleFile === 'function') {
-            window.handleFile(file);
-          } else {
-            console.log('Selected file:', file.name);
-          }
+        if (!file) return;
+        if (typeof window.handleFile === 'function') window.handleFile(file);
+        else console.log('Selected file:', file.name);
+      }
+
+      function openCamera(){
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+          .then(s => {
+            stream = s;
+            video.srcObject = stream;
+            cameraModal.style.display = 'flex';
+            video.play();
+          })
+          .catch(err => {
+            console.error('Camera error', err);
+            alert('Unable to access camera.');
+          });
+      }
+
+      function capturePhoto(){
+        if (!video.videoWidth || !video.videoHeight) return;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(blob => {
+          if (!blob) return;
+          const file = new File([blob], 'webcam.jpg', { type: blob.type });
+          if (typeof window.handleFile === 'function') window.handleFile(file);
+          else console.log('Captured photo:', file);
+        }, 'image/jpeg', 0.95);
+        closeCamera();
+      }
+
+      function closeCamera(){
+        cameraModal.style.display = 'none';
+        if (stream) {
+          stream.getTracks().forEach(t => t.stop());
+          stream = null;
         }
-      });
+        video.srcObject = null;
+      }
     })();
-  </script>
-</html>
+   </script>
+ </html>

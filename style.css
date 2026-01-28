@@ -1,4 +1,4 @@
-++/* Clean, responsive stylesheet for The Image Fryer */
+/* Clean, minimal stylesheet for The Image Fryer */
 html, body {
   margin: 0;
   padding: 0;
@@ -6,114 +6,87 @@ html, body {
   color: #fff;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
-*{outline:1px solid red;} /* debug */
 
+/* Center everything */
 main {
   min-height: 100vh;
-  padding: 0rem;
   display: flex;
-  flex-direction: row; /* mobile: stacked */
-  gap: 0rem;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem;
+  z-index: -1;
 }
 
-/* header artwork (full width above the content in mobile) */
+/* Header image */
 img[alt="The Image Fryer"] {
   width: 90%;
-  max-width: 80rem;
+  max-width: 73.3125rem;
   height: auto;
-  object-fit: cover;
   display: block;
 }
 
+/* Container for controls + fryer */
+.mainstuff {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
 
+/* Controls section */
 .controls {
-  width: 80%;
-  max-width: 25rem;
+  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 30rem;
 }
 
-.controls img { width: 100%; height: auto; object-fit: contain; display: block; }
-
-/* Big Fryer image (participates in flex layout) */
-img[alt="Big Fryer"] {
-  width: 90%;
-  padding: 0rem;
-}
-
-/* Desktop / horizontal layout: center the .mainstuff group, display controls left and fryer right */
-@media (min-width: 64rem) {
-  main {
-    flex-direction: column; /* keep header above */
-    align-items: center;
-  }
-
-
-
-  .controls {
-    width: 0rem;
-    align-items: flex-start;
-  }
-
-  img[alt="Big Fryer"] {
-    width: 44rem;
-  }
-}
-
-/* Utility rules */
-img { max-width: 100%; height: auto; display: block; }
-html, body {
-  margin: 5px;
-  padding: 5px;
-  padding-left: 5px;
-  background-color: rgb(0, 0, 0);
-
-/* Clean, stable stylesheet */
-html, body {
-  margin: 0;
-  padding: 0;
-  background: #000;
-  color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-/* Image Fryer sizing */
-img[alt="The Image Fryer"] {
-  /* Preferred fixed size, but allow shrinking on small viewports */
-  width: 73.3125rem;
-  max-width: 100%;
+.controls img {
+  width: 100%;
   height: auto;
-  aspect-ratio: 547/90;
   display: block;
-  margin: 0 auto;
-  object-fit: cover;
 }
 
-/* Tweak for small screens */
-@media (max-width: 48rem) {
-  img[alt="The Image Fryer"] {
-    width: 90%;
-    height: auto;
-  }
-}
-
-
-
-
-
-.controls img { width: 100%; height: auto; object-fit: contain; display: block; }
-
-
-/* Button reset and sizing for the choose-photo button */
+/* Choose photo button */
 .choose-btn {
   background: none;
   border: none;
   padding: 0;
   margin: 0;
-  display: block;
   width: 100%;
   cursor: pointer;
 }
 
-.choose-btn img { display: block; width: 100%; height: auto; object-fit: contain;}
+.choose-btn :hover {
+  opacity: 0.8;
+}
+
+.choose-btn img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Big Fryer image */
+img[alt="Big Fryer"] {
+  width: 90%;
+  max-width: 44rem;
+  height: auto;
+  display: block;
+}
+
+/* Desktop: controls on left, fryer on right */
+@media (min-width: 64rem) {
+  .mainstuff {
+    flex-direction: row;
+    align-items: center;
+    gap: 3rem;
+  }
+
+  img[alt="Big Fryer"] {
+    width: 100%;
+  }
+}
