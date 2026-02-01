@@ -2,9 +2,9 @@ let imgObj = null;
 
 function setup() {
   // create a modest canvas; will be resized when an image is loaded
-  const c = createCanvas(10,10);
+  const c = createCanvas(1100,800);
   c.id('p5canvas');
-  background(0);
+  background(50);
 }
 
 function draw() {
