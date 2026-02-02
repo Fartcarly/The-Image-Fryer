@@ -14,6 +14,21 @@
   </head>
   <body>
     <main>
+        <img src="img/The Image Fryer.png" alt="The Image Fryer">
+      
+      <div class="mainstuff">
+        <div class="controls">
+          <img src="img/Select Ingredients.png" alt="Select Ingredients">
+          <button id="choose-btn" class="choose-btn">
+            <img src="img/Choose File.png" class="hvr-grow" alt="Choose File...">
+          </button>
+          <input type="file" id="file-input" accept="image/*" style="display:none" />
+          <button id="take-photo-btn" class="choose-btn">
+            <img src="img/Take a photo.png" class="hvr-grow" alt="Take a photo">
+          </button>
+        </div>
+        <img src="img/Big Fryer3.png" alt="Big Fryer" id="big-fryer">
+      </div>
       <!-- Ingredients strip (implemented from Figma assets) -->
       <section class="ingredients">
         <figure class="ingredient">
@@ -41,19 +56,6 @@
           <img class="label" src="img/Object Icons/Words_0005_Fryer.png" alt="Fryer label">
         </figure>
       </section>
-      <div class="mainstuff">
-        <div class="controls">
-          <img src="img/Select Ingredients.png" alt="Select Ingredients">
-          <button id="choose-btn" class="choose-btn" aria-label="Choose file">
-            <img src="img/Choose File.png" alt="Choose File...">
-          </button>
-          <input type="file" id="file-input" accept="image/*" style="display:none" />
-          <button id="take-photo-btn" class="choose-btn" aria-label="Take a photo">
-            <img src="img/Take a photo.png" alt="Take a photo">
-          </button>
-        </div>
-        <img src="img/Big Fryer3.png" alt="Big Fryer">
-      </div>
     </main>
 
     <!-- Camera modal / UI -->
