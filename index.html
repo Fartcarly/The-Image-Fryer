@@ -30,7 +30,10 @@
             <img src="img/fry button.png" class="hvr-grow" alt="Fry Button">
           </button>
         </div>
-        <img src="img/Big Fryer3.png" alt="Big Fryer" id="big-fryer">
+        <div class="fryer-canvas-wrap">
+          <img src="img/Big Fryer3.png" alt="Big Fryer" id="big-fryer">
+          <button id="reset-image" class="reset-text" style="display:none">[RESET IMAGE]</button>
+        </div>
       </div>
       <!-- Ingredients strip (implemented from Figma assets) -->
       <section class="ingredients">
@@ -186,6 +189,12 @@
           } else {
             console.log('applyFry function not available yet');
           }
+        });
+      }
+      const resetBtn = document.getElementById('reset-image');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          if (typeof window.resetToOriginal === 'function') window.resetToOriginal();
         });
       }
     })();

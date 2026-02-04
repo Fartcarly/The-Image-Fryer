@@ -130,6 +130,33 @@ img[alt="Big Fryer"] {
   padding: 0;
 }
 
+/* Wrapper for canvas + reset control so reset can be absolutely positioned */
+.fryer-canvas-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+/* Reset text button attached to bottom-left of the canvas (doesn't affect layout) */
+.reset-text {
+  position: absolute;
+  left: 0;
+  bottom: -1.25rem; /* place just below the canvas */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #ffdd79;
+  font-family: Consolas, monospace;
+  font-size: 12pt;
+  cursor: pointer;
+  line-height: 1;
+}
+.reset-text:hover,
+.reset-text:focus {
+  color: #557f01;
+  outline: none;
+}
+
 /* Desktop: controls on left, fryer on right */
 @media (min-width: 64rem) {
   .mainstuff {
@@ -180,16 +207,16 @@ img[alt="Big Fryer"] {
   outline: none;
 }
 
-.ingredient-btn.selected {
-  animation: redGlowFadeIn 0.2s ease-in forwards;
+.ingredient-btn.selected img {
+  animation: redGlowFadeIn 0.1s ease-in forwards;
 }
 
 @keyframes redGlowFadeIn {
   from {
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+    filter: drop-shadow(0 0 0 rgba(255, 0, 0, 0));
   }
   to {
-    box-shadow: 0 0 12px 2px rgba(255, 0, 0, 0.8);
+    filter: drop-shadow(0 0 12px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 6px rgba(255, 0, 0, 0.6));
   }
 }
 

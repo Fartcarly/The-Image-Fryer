@@ -7,6 +7,8 @@ let targetW = 100;
 let targetH = 100;
 // Global filterType: 0 = fryer (default), 1 = blender, 2 = coffee, 3 = candle, 4 = green blob, 5 = mechanism
 window.filterType = 0;
+// store a copy of the last-loaded original image so we can reset
+window.originalImage = null;
 
 // Replace current canvas image with a small icon corresponding to filter
 window.replaceWithIcon = function(filter) {
@@ -21,6 +23,10 @@ window.replaceWithIcon = function(filter) {
   const path = map[filter];
   if (!path) return;
 
+  // hide reset button when switching to an object/filter (only visible after loading a user image)
+  const resetBtnStart = document.getElementById('reset-image');
+  if (resetBtnStart) resetBtnStart.style.display = 'none';
+
   // hide the fry button when switching objects
   const fryBtn = document.getElementById('fry-btn');
   if (fryBtn) fryBtn.style.display = 'none';
@@ -34,6 +40,8 @@ window.replaceWithIcon = function(filter) {
   loadImage(path,
     function(loaded) {
       imgObj = loaded;
+      // when switching to an icon, keep a reference to original photo (if any)
+      // (originalImage is only set when a real photo/file is loaded via handleFile)
       // scale image so its height is 500px (width kept proportional)
       const targetHpx = 500;
       const ratio = targetHpx / loaded.height;
@@ -53,8 +61,13 @@ window.replaceWithIcon = function(filter) {
         parent.appendChild(canvasEl);
         fryerImg.style.display = 'none';
         canvasEl.style.display = 'block';
+        // ensure reset button stays hidden while showing an object icon
+        const resetBtn = document.getElementById('reset-image');
+        if (resetBtn) resetBtn.style.display = 'none';
       } else if (canvasEl) {
         canvasEl.style.display = 'block';
+        const resetBtn = document.getElementById('reset-image');
+        if (resetBtn) resetBtn.style.display = 'none';
       }
     },
     function(err){ console.error('Failed to load icon', err); }
@@ -92,9 +105,9 @@ window.applyFry = function() {
       const gr = pix[i + 1];
       const b = pix[i + 2];
       // multiply blend mode: (pixel * color) / 255
-      pix[i] = Math.round((r * 139) / 255);
-      pix[i + 1] = Math.round((gr * 90) / 255);
-      pix[i + 2] = Math.round((b * 53) / 255);
+      pix[i] = Math.round((r * 209) / 255);
+      pix[i + 1] = Math.round((gr * 152) / 255);
+      pix[i + 2] = Math.round((b * 111) / 255);
       
       // apply faint vignette (darken edges)
       const distX = Math.abs(x - w / 2) / (w / 2);
@@ -111,7 +124,78 @@ window.applyFry = function() {
     imgObj = g.get();
     const canvasEl = document.getElementById('p5canvas');
     if (canvasEl) canvasEl.style.display = 'block';
+    const resetBtn = document.getElementById('reset-image');
+    if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied coffee filter: brown tint + vignette');
+  } else if (window.filterType === 4) {
+    // Green blob filter: blur > brightness > contrast > posterize > green overlay
+    g.filter(BLUR, 1.5);
+    
+    // Step 1: Reduce brightness
+    g.loadPixels();
+    const pix1 = g.pixels;
+    const brightness = 1;
+    for (let i = 0; i < pix1.length; i += 4) {
+      pix1[i] = Math.round(pix1[i] * brightness);
+      pix1[i + 1] = Math.round(pix1[i + 1] * brightness);
+      pix1[i + 2] = Math.round(pix1[i + 2] * brightness);
+      // keep alpha
+    }
+    g.updatePixels();
+    
+    // Step 2: Apply contrast
+    g.loadPixels();
+    const pix2 = g.pixels;
+    const contrast = 1.5;
+    for (let i = 0; i < pix2.length; i += 4) {
+      const r = pix2[i] / 255;
+      const gr = pix2[i + 1] / 255;
+      const b = pix2[i + 2] / 255;
+      
+      const contrastR = (r - 0.5) * contrast + 0.5;
+      const contrastG = (gr - 0.5) * contrast + 0.5;
+      const contrastB = (b - 0.5) * contrast + 0.5;
+      
+      pix2[i] = Math.round(Math.max(0, Math.min(1, contrastR)) * 255);
+      pix2[i + 1] = Math.round(Math.max(0, Math.min(1, contrastG)) * 255);
+      pix2[i + 2] = Math.round(Math.max(0, Math.min(1, contrastB)) * 255);
+      // keep alpha
+    }
+    g.updatePixels();
+    
+    // Step 3: Posterize
+    const levels = Math.floor(random(6, 10));
+    g.filter(POSTERIZE, levels);
+    
+    // Step 4: Overlay pure green with soft light blend mode
+    g.loadPixels();
+    const pix = g.pixels;
+    for (let i = 0; i < pix.length; i += 4) {
+      const r = pix[i] / 255;
+      const gr = pix[i + 1] / 255;
+      const b = pix[i + 2] / 255;
+      
+      // soft light blend mode with pure green (0, 1, 0)
+      const blendR = 0;
+      const blendG = 1;
+      const blendB = 0;
+      
+      const resultR = softLight(r, blendR);
+      const resultG = softLight(gr, blendG);
+      const resultB = softLight(b, blendB);
+      
+      pix[i] = Math.round(Math.max(0, Math.min(1, resultR)) * 255);
+      pix[i + 1] = Math.round(Math.max(0, Math.min(1, resultG)) * 255);
+      pix[i + 2] = Math.round(Math.max(0, Math.min(1, resultB)) * 255);
+      // keep alpha
+    }
+    g.updatePixels();
+    imgObj = g.get();
+    const canvasEl = document.getElementById('p5canvas');
+    if (canvasEl) canvasEl.style.display = 'block';
+    const resetBtn = document.getElementById('reset-image');
+    if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+    console.log('Applied green blob filter: blur > brightness > contrast > posterize=' + levels + ' > green overlay');
   } else {
     // Default fry (filterType 0): posterize + hue shift
     // posterize with random levels between 2 and 7
@@ -144,9 +228,36 @@ window.applyFry = function() {
     // ensure canvas is visible (in case it was hidden)
     const canvasEl = document.getElementById('p5canvas');
     if (canvasEl) canvasEl.style.display = 'block';
+    const resetBtn = document.getElementById('reset-image');
+    if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied fry: posterize=' + levels + ' hueShift=' + hueShift);
   }
 };
+
+// Reset displayed image to the last original loaded image (before any fry filters)
+window.resetToOriginal = function() {
+  if (!window.originalImage) return;
+  imgObj = window.originalImage.get();
+  // keep current scaled canvas size
+  try {
+    resizeCanvas(targetW, targetH);
+  } catch (e) {}
+  const canvasEl = document.getElementById('p5canvas');
+  if (canvasEl) canvasEl.style.display = 'block';
+  const fryerImg = document.getElementById('big-fryer');
+  if (fryerImg) fryerImg.style.display = 'none';
+  console.log('Image reset to original');
+};
+
+// Soft Light blend mode (normalized 0.0-1.0)
+// B = base color (bottom layer), A = blend color (top layer)
+function softLight(B, A) {
+  if (A <= 0.5) {
+    return (1 - 2 * A) * B * B + 2 * A * B;
+  } else {
+    return (2 * A - 1) * (Math.sqrt(B) - B) + 2 * A * B;
+  }
+}
 
 // helpers: RGB (0-255) -> HSL (h:0-360, s:0-1, l:0-1)
 function rgbToHsl(r, g, b) {
@@ -240,6 +351,8 @@ window.handleFile = function(file) {
   loadImage(url,
     function(loaded){
       imgObj = loaded;
+      // keep a pristine copy of the original loaded photo so we can reset later
+      try { window.originalImage = loaded.get(); } catch (e) { window.originalImage = null; }
       // scale image so its height is 500px (width kept proportional)
       const targetHpx = 500;
       const ratio = targetHpx / loaded.height;
@@ -260,8 +373,12 @@ window.handleFile = function(file) {
         parent.appendChild(canvasEl); // place canvas where fryer image was
         fryerImg.style.display = 'none';
         canvasEl.style.display = 'block';
+        const resetBtn = document.getElementById('reset-image');
+        if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
       } else if (canvasEl) {
         canvasEl.style.display = 'block';
+        const resetBtn = document.getElementById('reset-image');
+        if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
       }
 
       URL.revokeObjectURL(url);
