@@ -272,5 +272,4 @@ img[alt="Big Fryer"] {
     -moz-user-select: none;    /* Firefox */
     -ms-user-select: none;     /* Internet Explorer/Edge */
     user-select: none;         /* Standard syntax */
-    pointer-events: none;      /* Prevents image from being a pointer target on tap/click */
 }
