@@ -64,10 +64,14 @@ window.replaceWithIcon = function(filter) {
         // ensure reset button stays hidden while showing an object icon
         const resetBtn = document.getElementById('reset-image');
         if (resetBtn) resetBtn.style.display = 'none';
+        const downloadBtn = document.getElementById('download-image');
+        if (downloadBtn) downloadBtn.style.display = 'none';
       } else if (canvasEl) {
         canvasEl.style.display = 'block';
         const resetBtn = document.getElementById('reset-image');
         if (resetBtn) resetBtn.style.display = 'none';
+        const downloadBtn = document.getElementById('download-image');
+        if (downloadBtn) downloadBtn.style.display = 'none';
       }
     },
     function(err){ console.error('Failed to load icon', err); }
@@ -126,6 +130,8 @@ window.applyFry = function() {
     if (canvasEl) canvasEl.style.display = 'block';
     const resetBtn = document.getElementById('reset-image');
     if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+    const downloadBtn = document.getElementById('download-image');
+    if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied coffee filter: brown tint + vignette');
   } else if (window.filterType === 4) {
     // Green blob filter: blur > brightness > contrast > posterize > green overlay
@@ -134,7 +140,7 @@ window.applyFry = function() {
     // Step 1: Reduce brightness
     g.loadPixels();
     const pix1 = g.pixels;
-    const brightness = 1;
+    const brightness = 1.15;
     for (let i = 0; i < pix1.length; i += 4) {
       pix1[i] = Math.round(pix1[i] * brightness);
       pix1[i + 1] = Math.round(pix1[i + 1] * brightness);
@@ -146,7 +152,7 @@ window.applyFry = function() {
     // Step 2: Apply contrast
     g.loadPixels();
     const pix2 = g.pixels;
-    const contrast = 1.5;
+    const contrast = 1.3;
     for (let i = 0; i < pix2.length; i += 4) {
       const r = pix2[i] / 255;
       const gr = pix2[i + 1] / 255;
@@ -195,9 +201,45 @@ window.applyFry = function() {
     if (canvasEl) canvasEl.style.display = 'block';
     const resetBtn = document.getElementById('reset-image');
     if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+    const downloadBtn = document.getElementById('download-image');
+    if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied green blob filter: blur > brightness > contrast > posterize=' + levels + ' > green overlay');
   } else {
-    // Default fry (filterType 0): posterize + hue shift
+    // Default fry (filterType 0): randomized contrast & brightness -> posterize + hue shift
+    // random contrast factor between 1 and 25, random brightness factor between -1 and 10
+    const contrastFactor = random(0.7, 1.5);
+    const brightnessFactor = random(0.85, 1.6);
+    console.log('Fry pre-adjust: contrast=', contrastFactor.toFixed(2), ' brightness=', brightnessFactor.toFixed(2));
+
+    // Step A: apply brightness multiplier (clamped)
+    g.loadPixels();
+    let bpix = g.pixels;
+    for (let i = 0; i < bpix.length; i += 4) {
+      bpix[i] = Math.round(Math.max(0, Math.min(255, bpix[i] * brightnessFactor)));
+      bpix[i + 1] = Math.round(Math.max(0, Math.min(255, bpix[i + 1] * brightnessFactor)));
+      bpix[i + 2] = Math.round(Math.max(0, Math.min(255, bpix[i + 2] * brightnessFactor)));
+      // alpha unchanged
+    }
+    g.updatePixels();
+
+    // Step B: apply contrast around midpoint (0..1 normalized)
+    g.loadPixels();
+    let cpix = g.pixels;
+    for (let i = 0; i < cpix.length; i += 4) {
+      const r = cpix[i] / 255;
+      const gr = cpix[i + 1] / 255;
+      const b = cpix[i + 2] / 255;
+
+      const contrastR = (r - 0.5) * contrastFactor + 0.5;
+      const contrastG = (gr - 0.5) * contrastFactor + 0.5;
+      const contrastB = (b - 0.5) * contrastFactor + 0.5;
+
+      cpix[i] = Math.round(Math.max(0, Math.min(1, contrastR)) * 255);
+      cpix[i + 1] = Math.round(Math.max(0, Math.min(1, contrastG)) * 255);
+      cpix[i + 2] = Math.round(Math.max(0, Math.min(1, contrastB)) * 255);
+    }
+    g.updatePixels();
+
     // posterize with random levels between 2 and 7
     const levels = Math.floor(random(2, 8));
     g.filter(POSTERIZE, levels);
@@ -230,7 +272,9 @@ window.applyFry = function() {
     if (canvasEl) canvasEl.style.display = 'block';
     const resetBtn = document.getElementById('reset-image');
     if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
-    console.log('Applied fry: posterize=' + levels + ' hueShift=' + hueShift);
+    const downloadBtn = document.getElementById('download-image');
+    if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
+    console.log('Applied fry: posterize=' + levels + ' hueShift=' + hueShift + ' contrast=' + contrastFactor.toFixed(2) + ' brightness=' + brightnessFactor.toFixed(2));
   }
 };
 
@@ -247,6 +291,26 @@ window.resetToOriginal = function() {
   const fryerImg = document.getElementById('big-fryer');
   if (fryerImg) fryerImg.style.display = 'none';
   console.log('Image reset to original');
+};
+
+// Download the current canvas image as a PNG file
+window.downloadImage = function() {
+  const canvasEl = document.getElementById('p5canvas');
+  if (!canvasEl || canvasEl.style.display === 'none') {
+    console.log('Canvas not visible, cannot download');
+    return;
+  }
+  canvasEl.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'fried-image.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    console.log('Image downloaded');
+  }, 'image/png');
 };
 
 // Soft Light blend mode (normalized 0.0-1.0)
@@ -375,10 +439,14 @@ window.handleFile = function(file) {
         canvasEl.style.display = 'block';
         const resetBtn = document.getElementById('reset-image');
         if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+        const downloadBtn = document.getElementById('download-image');
+        if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
       } else if (canvasEl) {
         canvasEl.style.display = 'block';
         const resetBtn = document.getElementById('reset-image');
         if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+        const downloadBtn = document.getElementById('download-image');
+        if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
       }
 
       URL.revokeObjectURL(url);

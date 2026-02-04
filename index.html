@@ -33,6 +33,7 @@
         <div class="fryer-canvas-wrap">
           <img src="img/Big Fryer3.png" alt="Big Fryer" id="big-fryer">
           <button id="reset-image" class="reset-text" style="display:none">[RESET IMAGE]</button>
+          <button id="download-image" class="download-text" style="display:none">[DOWNLOAD IMAGE]</button>
         </div>
       </div>
       <!-- Ingredients strip (implemented from Figma assets) -->
@@ -195,6 +196,12 @@
       if (resetBtn) {
         resetBtn.addEventListener('click', () => {
           if (typeof window.resetToOriginal === 'function') window.resetToOriginal();
+        });
+      }
+      const downloadBtn = document.getElementById('download-image');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+          if (typeof window.downloadImage === 'function') window.downloadImage();
         });
       }
     })();

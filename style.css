@@ -150,9 +150,34 @@ img[alt="Big Fryer"] {
   font-size: 12pt;
   cursor: pointer;
   line-height: 1;
+  z-index: 20;
+  pointer-events: auto;
 }
 .reset-text:hover,
 .reset-text:focus {
+  color: #557f01;
+  outline: none;
+}
+
+/* Download text button attached to bottom-right of the canvas (doesn't affect layout) */
+.download-text {
+  position: absolute;
+  right: 0;
+  bottom: -1.25rem; /* place just below the canvas */
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #ffdd79;
+  font-family: Consolas, monospace;
+  font-size: 12pt;
+  cursor: pointer;
+  line-height: 1;
+  z-index: 20;
+  pointer-events: auto;
+}
+.download-text:hover,
+.download-text:focus {
   color: #557f01;
   outline: none;
 }
