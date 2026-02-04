@@ -204,6 +204,74 @@ window.applyFry = function() {
     const downloadBtn = document.getElementById('download-image');
     if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied green blob filter: blur > brightness > contrast > posterize=' + levels + ' > green overlay');
+  } else if (window.filterType === 3) {
+    // Candle filter: orange multiply + fire.jpg overlay (black pixels transparent)
+    // Step 1: Apply orange multiply (RGB: 255, 220, 150)
+    g.loadPixels();
+    const pix = g.pixels;
+    for (let i = 0; i < pix.length; i += 4) {
+      const r = pix[i];
+      const gr = pix[i + 1];
+      const b = pix[i + 2];
+      // multiply blend: (pixel * color) / 255
+      pix[i] = Math.round((r * 255) / 255); // R stays same
+      pix[i + 1] = Math.round((gr * 220) / 255); // G * 220
+      pix[i + 2] = Math.round((b * 150) / 255); // B * 150
+    }
+    g.updatePixels();
+
+    // Step 2: Load and overlay fire.jpg (black pixels don't change image)
+    loadImage('img/fire.jpg',
+      function(fireImg) {
+        // scale fire image to match canvas size
+        fireImg.resize(width, height);
+        g.loadPixels();
+        fireImg.loadPixels();
+        const canvasPix = g.pixels;
+        const firePix = fireImg.pixels;
+        for (let i = 0; i < canvasPix.length; i += 4) {
+          const fireR = firePix[i];
+          const fireG = firePix[i + 1];
+          const fireB = firePix[i + 2];
+          // if fire pixel is not black, blend it using screen mode (brightens)
+          const brightness = (fireR + fireG + fireB) / 3;
+          if (brightness > 5) {
+            // screen blend: 1 - (1 - A) * (1 - B)
+            const aR = canvasPix[i] / 255;
+            const aG = canvasPix[i + 1] / 255;
+            const aB = canvasPix[i + 2] / 255;
+            const bR = fireR / 255;
+            const bG = fireG / 255;
+            const bB = fireB / 255;
+            canvasPix[i] = Math.round((1 - (1 - aR) * (1 - bR)) * 255);
+            canvasPix[i + 1] = Math.round((1 - (1 - aG) * (1 - bG)) * 255);
+            canvasPix[i + 2] = Math.round((1 - (1 - aB) * (1 - bB)) * 255);
+          }
+        }
+        g.updatePixels();
+        imgObj = g.get();
+        const canvasEl = document.getElementById('p5canvas');
+        if (canvasEl) canvasEl.style.display = 'block';
+        const resetBtn = document.getElementById('reset-image');
+        if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+        const downloadBtn = document.getElementById('download-image');
+        if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
+        console.log('Applied candle filter: orange multiply + fire overlay');
+      },
+      function(err) {
+        console.error('Failed to load fire.jpg', err);
+        // fallback: just apply orange multiply without fire
+        imgObj = g.get();
+        const canvasEl = document.getElementById('p5canvas');
+        if (canvasEl) canvasEl.style.display = 'block';
+        const resetBtn = document.getElementById('reset-image');
+        if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+        const downloadBtn = document.getElementById('download-image');
+        if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
+        console.log('Applied candle filter: orange multiply (fire.jpg not found)');
+      }
+    );
+    return;
   } else if (window.filterType === 1) {
     // Blender / datamosh filter: run exactly 64 randomized region redraws
     const regionSize = 64;
@@ -232,6 +300,50 @@ window.applyFry = function() {
     const downloadBtn = document.getElementById('download-image');
     if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied blender datamosh: iterations=64 regionSize=' + regionSize + ' offsetMax=' + offsetMax);
+  
+  
+  } else if (window.filterType === 5) {
+    // Mechanism filter: grid shuffle — split into 8-10 cols, shuffle grid squares, fill entire canvas
+    // calculate square size: aim for 8-10 squares horizontally, adjust to fill height
+    const squareSize = Math.floor(width / 9); // close to 8-10 cols
+    const cols = Math.floor(width / squareSize);
+    const rows = Math.ceil(height / squareSize); // round up to ensure full canvas height coverage
+    const totalSquares = cols * rows;
+
+    // extract all grid squares into an array
+    const squares = [];
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const sx = col * squareSize;
+        const sy = row * squareSize;
+        const region = g.get(sx, sy, squareSize, squareSize);
+        squares.push({ region: region, row: row, col: col });
+      }
+    }
+
+    // Fisher-Yates shuffle the array
+    for (let i = squares.length - 1; i > 0; i--) {
+      const j = Math.floor(random(i + 1));
+      [squares[i], squares[j]] = [squares[j], squares[i]];
+    }
+
+    // redraw shuffled squares back onto canvas
+    for (let idx = 0; idx < squares.length; idx++) {
+      const row = Math.floor(idx / cols);
+      const col = idx % cols;
+      const dx = col * squareSize;
+      const dy = row * squareSize;
+      g.image(squares[idx].region, dx, dy);
+    }
+
+    imgObj = g.get();
+    const canvasEl = document.getElementById('p5canvas');
+    if (canvasEl) canvasEl.style.display = 'block';
+    const resetBtn = document.getElementById('reset-image');
+    if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+    const downloadBtn = document.getElementById('download-image');
+    if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
+    console.log('Applied mechanism filter: grid shuffle cols=' + cols + ' rows=' + rows + ' squareSize=' + squareSize);
   } else {
     // Default fry (filterType 0): randomized contrast & brightness -> posterize + hue shift
     // random contrast factor between 1 and 25, random brightness factor between -1 and 10
