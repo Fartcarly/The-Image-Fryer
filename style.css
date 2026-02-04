@@ -57,6 +57,7 @@ img[alt="The Image Fryer"] {
   width: auto;
   height: 26px;
   display: block;
+  padding-top: 1rem;
 }
 
 
@@ -66,7 +67,8 @@ img[alt="The Image Fryer"] {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding-top: 1rem
+  padding-top: 1rem;
+  position: relative;
 }
 
 /* Controls section */
@@ -94,13 +96,20 @@ img[alt="The Image Fryer"] {
   cursor: pointer;
 }
 
-
-
 .choose-btn img {
   width: 100%;
   height: auto;
   display: block;
 }
+
+/* Smaller fry button (overrides .choose-btn full-width) */
+#fry-btn {
+  width: 250px;
+  margin: 0 auto;
+  display: none;
+  cursor: pointer;
+}
+
 
 /* Big Fryer image */
 img[alt="Big Fryer"] {
@@ -109,6 +118,16 @@ img[alt="Big Fryer"] {
   height: auto;
   display: block;
   padding-left: 4rem;
+}
+
+/* p5js canvas styling - matches fryer image constraints */
+#p5canvas {
+  display: block !important;
+  margin: 0 auto;
+  max-width: 90%;
+  max-height: 80vh;
+  height: auto;
+  padding: 0;
 }
 
 /* Desktop: controls on left, fryer on right */
@@ -143,4 +162,53 @@ img[alt="Big Fryer"] {
 .hvr-grow:focus,
 .hvr-grow:active {
     transform: scale(1.03);
+}
+
+/* Buttons for ingredient icons */
+.ingredient-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ingredient-btn:focus {
+  outline: none;
+}
+
+.ingredient-btn.selected {
+  animation: redGlowFadeIn 0.2s ease-in forwards;
+}
+
+@keyframes redGlowFadeIn {
+  from {
+    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+  }
+  to {
+    box-shadow: 0 0 12px 2px rgba(255, 0, 0, 0.8);
+  }
+}
+
+
+/* Float */
+.hvr-float {
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+.hvr-float:hover, .hvr-float:focus, .hvr-float:active {
+  -webkit-transform: translateY(-8px);
+  transform: translateY(-8px);
 }

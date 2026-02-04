@@ -26,33 +26,48 @@
           <button id="take-photo-btn" class="choose-btn">
             <img src="img/Take a photo.png" class="hvr-grow" alt="Take a photo">
           </button>
+          <button id="fry-btn" class="choose-btn" style="display:none;margin-top:0.5rem;">
+            <img src="img/fry button.png" class="hvr-grow" alt="Fry Button">
+          </button>
         </div>
         <img src="img/Big Fryer3.png" alt="Big Fryer" id="big-fryer">
       </div>
       <!-- Ingredients strip (implemented from Figma assets) -->
       <section class="ingredients">
         <figure class="ingredient">
-          <img class="icon" src="img/Object Icons/blender.png" alt="Blender">
+          <button class="ingredient-btn" aria-label="Blender" data-filter="1">
+            <img class="icon hvr-float" src="img/Object Icons/blender.png" alt="Blender">
+          </button>
           <img class="label" src="img/Object Icons/Words_0000_Blender.png" alt="Blender label">
         </figure>
         <figure class="ingredient">
-          <img class="icon" src="img/Object Icons/Coffee.png" alt="Coffee">
+          <button class="ingredient-btn" aria-label="Coffee" data-filter="2">
+            <img class="icon hvr-float" src="img/Object Icons/Coffee.png" alt="Coffee">
+          </button>
           <img class="label" src="img/Object Icons/Words_0001_Coffee.png" alt="Coffee label">
         </figure>
         <figure class="ingredient">
-          <img class="icon" src="img/Object Icons/candle2.png" alt="Candle">
+          <button class="ingredient-btn" aria-label="Candle" data-filter="3">
+            <img class="icon hvr-float" src="img/Object Icons/candle2.png" alt="Candle">
+          </button>
           <img class="label" src="img/Object Icons/Words_0002_Candle.png" alt="Candle label">
         </figure>
         <figure class="ingredient">
-          <img class="icon" src="img/Object Icons/Green Blob.png" alt="Green blob">
+          <button class="ingredient-btn" aria-label="Green blob" data-filter="4">
+            <img class="icon hvr-float" src="img/Object Icons/Green Blob.png" alt="Green blob">
+          </button>
           <img class="label" src="img/Object Icons/Words_0003_green-Blob.png" alt="Green blob label">
         </figure>
         <figure class="ingredient">
-          <img class="icon" src="img/Object Icons/Mechanism.png" alt="Mechanism">
+          <button class="ingredient-btn" aria-label="Mechanism" data-filter="5">
+            <img class="icon hvr-float" src="img/Object Icons/Mechanism.png" alt="Mechanism">
+          </button>
           <img class="label" src="img/Object Icons/Words_0004_Mechanism.png" alt="Mechanism label">
         </figure>
         <figure class="ingredient">
-          <img class="icon" src="img/Object Icons/Image Fryer.png" alt="Small Fryer">
+          <button class="ingredient-btn" aria-label="Fryer" data-filter="0">
+            <img class="icon hvr-float" src="img/Object Icons/Image Fryer.png" alt="Small Fryer">
+          </button>
           <img class="label" src="img/Object Icons/Words_0005_Fryer.png" alt="Fryer label">
         </figure>
       </section>
@@ -83,9 +98,13 @@
       const canvas = document.getElementById('camera-canvas');
       let stream = null;
 
+      const fryBtn = document.getElementById('fry-btn');
       if (chooseBtn && fileInput) {
         chooseBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', handleFileSelect);
+        fileInput.addEventListener('change', (e) => {
+          handleFileSelect(e);
+          if (fryBtn) fryBtn.style.display = 'block';
+        });
       }
 
       if (takePhotoBtn) {
@@ -127,6 +146,7 @@
           const file = new File([blob], 'webcam.jpg', { type: blob.type });
           if (typeof window.handleFile === 'function') window.handleFile(file);
           else console.log('Captured photo:', file);
+          if (fryBtn) fryBtn.style.display = 'block';
         }, 'image/jpeg', 0.95);
         closeCamera();
       }
@@ -138,6 +158,35 @@
           stream = null;
         }
         video.srcObject = null;
+      }
+
+      // set global filterType when ingredient buttons are clicked
+      const ingredientBtns = document.querySelectorAll('.ingredient-btn');
+      ingredientBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const f = btn.getAttribute('data-filter');
+          if (f !== null) {
+            window.filterType = parseInt(f, 10);
+            console.log('filterType =', window.filterType);
+            // add red glow to selected button, remove from others
+            ingredientBtns.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            if (typeof window.replaceWithIcon === 'function') {
+              window.replaceWithIcon(window.filterType);
+            }
+          }
+        });
+      });
+
+      // fry button: apply filter effects to the canvas image
+      if (fryBtn) {
+        fryBtn.addEventListener('click', () => {
+          if (typeof window.applyFry === 'function') {
+            window.applyFry();
+          } else {
+            console.log('applyFry function not available yet');
+          }
+        });
       }
     })();
    </script>
