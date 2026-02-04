@@ -191,6 +191,12 @@
             console.log('applyFry function not available yet');
           }
         });
+        // shrink while pressed (mouse/touch)
+        fryBtn.addEventListener('mousedown', () => fryBtn.classList.add('pressed'));
+        fryBtn.addEventListener('mouseup', () => fryBtn.classList.remove('pressed'));
+        fryBtn.addEventListener('mouseleave', () => fryBtn.classList.remove('pressed'));
+        fryBtn.addEventListener('touchstart', () => fryBtn.classList.add('pressed'));
+        fryBtn.addEventListener('touchend', () => fryBtn.classList.remove('pressed'));
       }
       const resetBtn = document.getElementById('reset-image');
       if (resetBtn) {

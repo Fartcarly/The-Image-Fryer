@@ -109,9 +109,9 @@ window.applyFry = function() {
       const gr = pix[i + 1];
       const b = pix[i + 2];
       // multiply blend mode: (pixel * color) / 255
-      pix[i] = Math.round((r * 209) / 255);
-      pix[i + 1] = Math.round((gr * 152) / 255);
-      pix[i + 2] = Math.round((b * 111) / 255);
+      pix[i] = Math.round((r * 232)  / 255);
+      pix[i + 1] = Math.round((gr * 177) / 255);
+      pix[i + 2] = Math.round((b * 137) / 255);
       
       // apply faint vignette (darken edges)
       const distX = Math.abs(x - w / 2) / (w / 2);
@@ -204,6 +204,34 @@ window.applyFry = function() {
     const downloadBtn = document.getElementById('download-image');
     if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied green blob filter: blur > brightness > contrast > posterize=' + levels + ' > green overlay');
+  } else if (window.filterType === 1) {
+    // Blender / datamosh filter: run exactly 64 randomized region redraws
+    const regionSize = 64;
+    const offsetMax = 10;
+    for (let iter = 0; iter < 64; iter++) {
+      // random sampling position, clamped so region fits
+      const rX = Math.floor(random(0, Math.max(1, width - regionSize)));
+      const rY = Math.floor(random(0, Math.max(1, height - regionSize)));
+      // sample region from the graphics buffer
+      const region = g.get(rX, rY, regionSize, regionSize);
+      // apply a small posterize to the region for glitch texture
+      region.filter(POSTERIZE, 16);
+      // random offset to redraw slightly displaced
+      const offsetX = Math.floor(random(-offsetMax, offsetMax));
+      const offsetY = Math.floor(random(-offsetMax, offsetMax));
+      const dx = Math.min(Math.max(0, rX + offsetX), width - regionSize);
+      const dy = Math.min(Math.max(0, rY + offsetY), height - regionSize);
+      g.image(region, dx, dy);
+    }
+    // replace the displayed image with the result
+    imgObj = g.get();
+    const canvasEl = document.getElementById('p5canvas');
+    if (canvasEl) canvasEl.style.display = 'block';
+    const resetBtn = document.getElementById('reset-image');
+    if (resetBtn) resetBtn.style.display = (window.originalImage ? 'block' : 'none');
+    const downloadBtn = document.getElementById('download-image');
+    if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
+    console.log('Applied blender datamosh: iterations=64 regionSize=' + regionSize + ' offsetMax=' + offsetMax);
   } else {
     // Default fry (filterType 0): randomized contrast & brightness -> posterize + hue shift
     // random contrast factor between 1 and 25, random brightness factor between -1 and 10
@@ -304,7 +332,7 @@ window.downloadImage = function() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'fried-image.png';
+    a.download = 'FRIED_IMAGE.png';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

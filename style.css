@@ -140,7 +140,7 @@ img[alt="Big Fryer"] {
 .reset-text {
   position: absolute;
   left: 0;
-  bottom: -1.25rem; /* place just below the canvas */
+  bottom: -3rem; /* place just below the canvas */
   background: none;
   border: none;
   padding: 0;
@@ -150,8 +150,6 @@ img[alt="Big Fryer"] {
   font-size: 12pt;
   cursor: pointer;
   line-height: 1;
-  z-index: 20;
-  pointer-events: auto;
 }
 .reset-text:hover,
 .reset-text:focus {
@@ -163,7 +161,7 @@ img[alt="Big Fryer"] {
 .download-text {
   position: absolute;
   right: 0;
-  bottom: -1.25rem; /* place just below the canvas */
+  bottom: -3rem; /* place just below the canvas */
   background: none;
   border: none;
   padding: 0;
@@ -173,8 +171,6 @@ img[alt="Big Fryer"] {
   font-size: 12pt;
   cursor: pointer;
   line-height: 1;
-  z-index: 20;
-  pointer-events: auto;
 }
 .download-text:hover,
 .download-text:focus {
@@ -214,6 +210,12 @@ img[alt="Big Fryer"] {
 .hvr-grow:focus,
 .hvr-grow:active {
     transform: scale(1.03);
+}
+
+/* Fry button shrink while pressed (mouse or touch) */
+#fry-btn:active .hvr-grow,
+#fry-btn.pressed .hvr-grow {
+  transform: scale(0.92) !important;
 }
 
 /* Buttons for ingredient icons */
