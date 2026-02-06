@@ -36,8 +36,10 @@
         </div>
       </div>
       <!-- Ingredients strip (implemented from Figma assets) -->
-      <section class="ingredients">
-        <figure class="ingredient">
+<section class="ingredients">
+  <img src="img/choosefilter.png" alt="Choose Filter" class="choose-filter-image">
+  <div class="ingredients-strip">
+    <figure class="ingredient">
           <button class="ingredient-btn" aria-label="Blender" data-filter="1">
             <img class="icon hvr-float" src="img/Object Icons/blender.png" alt="Blender">
           </button>
@@ -125,19 +127,19 @@
       }
 
       function openCamera(){
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
-          .then(s => {
-            stream = s;
-            video.srcObject = stream;
-            cameraModal.style.display = 'flex';
-            video.play();
-          })
-          .catch(err => {
-            console.error('Camera error', err);
-            alert('Unable to access camera.');
-          });
-      }
-
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(s => {
+      stream = s;
+      video.srcObject = stream;
+      video.style.transform = 'scaleX(-1)'; // Flip the video display
+      cameraModal.style.display = 'flex';
+      video.play();
+    })
+    .catch(err => {
+      console.error('Camera error', err);
+      alert('Unable to access camera.');
+    });
+}
       function capturePhoto(){
         if (!video.videoWidth || !video.videoHeight) return;
         canvas.width = video.videoWidth;
