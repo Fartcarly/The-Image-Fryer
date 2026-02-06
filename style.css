@@ -273,3 +273,18 @@ img[alt="Big Fryer"] {
     -ms-user-select: none;     /* Internet Explorer/Edge */
     user-select: none;         /* Standard syntax */
 }
+
+html::-webkit-scrollbar {
+  width: 15px;
+}
+ 
+html::-webkit-scrollbar-track {
+  background: black;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+ 
+html::-webkit-scrollbar-thumb {
+  background: #478057;
+  border: 1px solid #86e986;
+  border-radius: 5px;
+}
