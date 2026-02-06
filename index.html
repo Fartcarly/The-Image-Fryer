@@ -83,8 +83,8 @@
       <div style="display:flex;flex-direction:column;gap:0.5rem;align-items:center;">
         <video id="camera-video" autoplay playsinline style="max-width:90vw;max-height:70vh;background:#000;"></video>
         <div style="display:flex;gap:0.5rem;">
-          <button id="capture-btn">Capture</button>
-          <button id="close-camera-btn">Close</button>
+          <button id="capture-btn">capture</button>
+          <button id="close-camera-btn">close</button>
         </div>
       </div>
     </div>
@@ -126,12 +126,17 @@
         else console.log('Selected file:', file.name);
       }
 
-      function openCamera(){
+function openCamera(){
   navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
     .then(s => {
       stream = s;
       video.srcObject = stream;
-      video.style.transform = 'scaleX(-1)'; // Flip the video display
+      // Only mirror on desktop (when screen width > 768px)
+      if (window.innerWidth > 768) {
+        video.style.transform = 'scaleX(-1)';
+      } else {
+        video.style.transform = 'none';
+      }
       cameraModal.style.display = 'flex';
       video.play();
     })
