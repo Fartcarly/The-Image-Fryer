@@ -197,6 +197,31 @@ img[alt="Big Fryer"] {
   outline: none;
 }
 
+/* Camera modal buttons */
+#capture-btn,
+#close-camera-btn {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  background: #557f01;
+  color: #ffdd79;
+  border: 2px solid #ffdd79;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: Consolas, monospace;
+  transition: all 0.2s ease;
+}
+
+#capture-btn:hover,
+#close-camera-btn:hover {
+  background: #557f01;
+  transform: scale(1.05);
+}
+
+#capture-btn:active,
+#close-camera-btn:active {
+  transform: scale(0.95);
+}
+
 /* Desktop: controls on left, fryer on right */ 
 
 @media (min-width: 64rem) {
