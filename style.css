@@ -27,17 +27,36 @@ img[alt="The Image Fryer"] {
   display: block;
 }
 
-/* Ingredients strip (from Figma) */
+/* Ingredients section - now contains both the header image and strip */
 .ingredients {
   width: 100%;
   max-width: 1200px;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2.3rem 0;
+}
+
+/* Choose filter header image */
+.choose-filter-image {
+  width: 90%;
+  max-width: 30rem;
+  height: auto;
+  display: block;
+}
+
+/* Ingredients strip wrapper */
+.ingredients-strip {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
   gap: 1.25rem;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.75rem 0;
   overflow-x: auto;
 }
+
 
 .ingredient {
   display: flex;
@@ -117,7 +136,7 @@ img[alt="Big Fryer"] {
   max-width: 35rem;
   height: auto;
   display: block;
-  padding-left: 4rem;
+  padding-left: 2rem;
 }
 
 /* p5js canvas styling - matches fryer image constraints */
@@ -178,24 +197,25 @@ img[alt="Big Fryer"] {
   outline: none;
 }
 
-/* Desktop: controls on left, fryer on right */
+/* Desktop: controls on left, fryer on right */ 
+
 @media (min-width: 64rem) {
   .mainstuff {
     flex-direction: row;
     align-items: flex-start;
     gap: 3rem;
   }
-
-  img[alt="Big Fryer"] {
-    width: 100%;
-  }
-
   .ingredients-strip {
     flex-wrap: nowrap;
   }
+  img[alt="Big Fryer"] {
+    width: 100%;
+  }
   /* larger icons on desktop to match Figma sizes */
-  .ingredient .icon { width: 130px; }
+  .ingredient .icon { width: 130px; 
+  }
 }
+
 
 /* Grow */
 .hvr-grow {
