@@ -190,6 +190,9 @@ img[alt="Big Fryer"] {
     width: 100%;
   }
 
+  .ingredients-strip {
+    flex-wrap: nowrap;
+  }
   /* larger icons on desktop to match Figma sizes */
   .ingredient .icon { width: 130px; }
 }
