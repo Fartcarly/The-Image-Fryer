@@ -345,43 +345,8 @@ window.applyFry = function() {
     if (downloadBtn) downloadBtn.style.display = (window.originalImage ? 'block' : 'none');
     console.log('Applied mechanism filter: grid shuffle cols=' + cols + ' rows=' + rows + ' squareSize=' + squareSize);
   } else {
-    // Default fry (filterType 0): randomized contrast & brightness -> posterize + hue shift
-    // random contrast factor between 1 and 25, random brightness factor between -1 and 10
-    const contrastFactor = random(0.7, 1.5);
-    const brightnessFactor = random(0.85, 1.6);
-    console.log('Fry pre-adjust: contrast=', contrastFactor.toFixed(2), ' brightness=', brightnessFactor.toFixed(2));
-
-    // Step A: apply brightness multiplier (clamped)
-    g.loadPixels();
-    let bpix = g.pixels;
-    for (let i = 0; i < bpix.length; i += 4) {
-      bpix[i] = Math.round(Math.max(0, Math.min(255, bpix[i] * brightnessFactor)));
-      bpix[i + 1] = Math.round(Math.max(0, Math.min(255, bpix[i + 1] * brightnessFactor)));
-      bpix[i + 2] = Math.round(Math.max(0, Math.min(255, bpix[i + 2] * brightnessFactor)));
-      // alpha unchanged
-    }
-    g.updatePixels();
-
-    // Step B: apply contrast around midpoint (0..1 normalized)
-    g.loadPixels();
-    let cpix = g.pixels;
-    for (let i = 0; i < cpix.length; i += 4) {
-      const r = cpix[i] / 255;
-      const gr = cpix[i + 1] / 255;
-      const b = cpix[i + 2] / 255;
-
-      const contrastR = (r - 0.5) * contrastFactor + 0.5;
-      const contrastG = (gr - 0.5) * contrastFactor + 0.5;
-      const contrastB = (b - 0.5) * contrastFactor + 0.5;
-
-      cpix[i] = Math.round(Math.max(0, Math.min(1, contrastR)) * 255);
-      cpix[i + 1] = Math.round(Math.max(0, Math.min(1, contrastG)) * 255);
-      cpix[i + 2] = Math.round(Math.max(0, Math.min(1, contrastB)) * 255);
-    }
-    g.updatePixels();
-
-    // posterize with random levels between 2 and 7
-    const levels = Math.floor(random(2, 8));
+    // Default fry (filterType 0): posterize + hue shift
+    const levels = Math.floor(random(2, 10));
     g.filter(POSTERIZE, levels);
 
     // random hue shift 0-360
